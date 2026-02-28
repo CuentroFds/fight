@@ -1,0 +1,22 @@
+using UnityEngine;
+
+public class CameraControll : MonoBehaviour
+{
+  GameObject player1;
+  GameObject player2;
+  Vector3 camPosition;
+  Vector2 camSpace;
+  [SerializeField] Camera camera;
+  // Start is called once before the first execution of Update after the MonoBehaviour is created
+  void Start()
+  {
+    player1 = GameObject.Find("Player1");
+    player2 = GameObject.Find("Player2");
+  }
+  void FixedUpdate()
+  {
+    Vector3 middle = player1.transform.position - player2.transform.position;
+    camPosition = new Vector3(middle.x, transform.position.y, transform.position.z);
+    camera.transform.position = camPosition;
+  }
+}
