@@ -8,6 +8,10 @@ public class PlayerMovement : MonoBehaviour
 
   [SerializeField] float walkSpeed = 100;
   [SerializeField] float gravityForce = 140f;
+  [SerializeField] float jumpForce = 100;
+
+  int counter = 0;
+
   Vector3 velocity;
 
   LayerMask groundMask;
@@ -20,14 +24,13 @@ public class PlayerMovement : MonoBehaviour
   bool isPunch;
   bool isKick;
   bool isGrab;
+  bool isJumping;
 
   bool isLeftPressed = false;
 
   void Start()
   {
     groundMask = LayerMask.GetMask("ground");
-    velocity = new Vector3(0, 0, 0);
-    velocity.y -= gravityForce * Time.fixedDeltaTime;
     rb = GetComponent<Rigidbody>();
     playerController = GetComponent<PlayerController>();
 
@@ -43,7 +46,9 @@ public class PlayerMovement : MonoBehaviour
   {
     HandleGravity();
     Movement();
-
+    DoJump();
+    HandleJump();
+    ApplyVelocity();
   }
 
   void HandleUp(InputAction.CallbackContext context)
@@ -143,7 +148,7 @@ public class PlayerMovement : MonoBehaviour
       }
       Debug.Log(moveDirection);
 
-      rb.MovePosition(rb.position + moveDirection * Time.deltaTime);
+      velocity += moveDirection;
     }
     else if (isRight)
     {
@@ -159,7 +164,7 @@ public class PlayerMovement : MonoBehaviour
       }
       Debug.Log(moveDirection);
 
-      rb.MovePosition(rb.position + moveDirection * Time.deltaTime);
+      velocity += moveDirection;
 
     }
   }
@@ -167,7 +172,7 @@ public class PlayerMovement : MonoBehaviour
   bool IsGroundedCheck()
   {
     //make it get the player height and divide by 2
-    if (Physics.Raycast(transform.position, Vector3.down, 0.90f, groundMask))
+    if (Physics.Raycast(transform.position, Vector3.down, 0.9f, groundMask))
     {
       return true;
     }
@@ -181,9 +186,36 @@ public class PlayerMovement : MonoBehaviour
   {
     if (!IsGroundedCheck())
     {
-      rb.MovePosition(rb.position + velocity * Time.deltaTime);
+      velocity += new Vector3(0, -gravityForce, 0);
     }
+  }
+  void ApplyVelocity()
+  {
+    rb.MovePosition(rb.position + (velocity * Time.fixedDeltaTime));
+    Debug.Log(velocity);
+    velocity = Vector3.zero;
+  }
 
+  void DoJump()
+  {
+    if (isUp && IsGroundedCheck())
+    {
+      isJumping = true;
+    }
+  }
+
+  void HandleJump()
+  {
+    if (isJumping && counter < 20)
+    {
+      counter++;
+      velocity += new Vector3(0, jumpForce + gravityForce, 0);
+    }
+    else
+    {
+      isJumping = false;
+      counter = 0;
+    }
   }
 }
 

@@ -15,8 +15,8 @@ public class CameraControll : MonoBehaviour
   }
   void FixedUpdate()
   {
-    Vector3 middle = player1.transform.position - player2.transform.position;
-    camPosition = new Vector3(middle.x, transform.position.y, transform.position.z);
+    float difference = player2.transform.position.x - player1.transform.position.x;
+    camPosition = new Vector3(difference / 2 + player1.transform.position.x, camera.transform.position.y, camera.transform.position.z);
     camera.transform.position = camPosition;
   }
 }
